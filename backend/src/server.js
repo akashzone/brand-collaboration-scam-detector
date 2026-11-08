@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
+import healthRoutes from "./routes/healthRoutes.js";
 
 dotenv.config();
 
@@ -15,13 +16,8 @@ app.get("/", (req, res) => {
   res.send("Scam Detector Backend is running!");
 });
 
-app.get("/api/health",(req,res)=>{
-    res.status(200).json({
-        status:"ok",
-        message:"Backend is healthy",
-        timestamp: new Date().toISOString()
-    })
-})
+// Health API
+app.use("/api/health", healthRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
