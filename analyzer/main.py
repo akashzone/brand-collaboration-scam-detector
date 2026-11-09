@@ -2,6 +2,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, field_validator
 
+from services.text_analyzer import analyze_text
+
 # Initialize FastAPI
 app = FastAPI(
     title="Scam Detector Analyzer",
@@ -46,16 +48,19 @@ def health_check():
     }
 
 
-# Message analysis endpoint
+
 @app.post("/analyze")
 def analyze_message(request: AnalyzeRequest):
     message = request.message
+
+    analysis_result = analyze_text(message)
 
     return {
         "success": True,
         "data": {
             "message": message,
             "characterCount": len(message),
-            "status": "received"
+            "status": "analysis_completed",
+            "textAnalysis": analysis_result
         }
     }
