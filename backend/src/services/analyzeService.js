@@ -1,10 +1,13 @@
 
-export const analyzeMessage = (message) => {
-    const trimmedMessage = message.trim();
+import axios from "axios";
 
-    return {
-        message: trimmedMessage,
-        characterCount: trimmedMessage.length,
-        status: "received"
-    };
+export const analyzeMessage = async (message) => {
+    const response = await axios.post(
+        `${process.env.ANALYZER_URL}/analyze`,
+        {
+            message
+        }
+    );
+
+    return response.data.data;
 };

@@ -1,11 +1,10 @@
 
 import { analyzeMessage } from "../services/analyzeService.js";
 
-export const analyzeMessageController = (req, res) => {
+export const analyzeMessageController = async (req, res) => {
     try {
         const { message } = req.body;
 
-        // Check whether message exists
         if (!message) {
             return res.status(400).json({
                 success: false,
@@ -13,7 +12,6 @@ export const analyzeMessageController = (req, res) => {
             });
         }
 
-        // Check whether message is a string
         if (typeof message !== "string") {
             return res.status(400).json({
                 success: false,
@@ -21,7 +19,6 @@ export const analyzeMessageController = (req, res) => {
             });
         }
 
-        // Check whether message is empty
         if (!message.trim()) {
             return res.status(400).json({
                 success: false,
@@ -29,7 +26,6 @@ export const analyzeMessageController = (req, res) => {
             });
         }
 
-        // Check message length
         if (message.length > 10000) {
             return res.status(400).json({
                 success: false,
@@ -37,7 +33,8 @@ export const analyzeMessageController = (req, res) => {
             });
         }
 
-        const result = analyzeMessage(message);
+        // Send the message to Python Analyzer
+        const result = await analyzeMessage(message);
 
         return res.status(200).json({
             success: true,
@@ -45,7 +42,17 @@ export const analyzeMessageController = (req, res) => {
         });
 
     } catch (error) {
-        console.error("Analysis error:", error);
+        console.error("Analysis error:", error.message);
+
+        if (
+            error.code === "ECONNREFUSED" ||
+            error.code === "ETIMEDOUT"
+        ) {
+            return res.status(503).json({
+                success: false,
+                message: "Python Analyzer is currently unavailable"
+            });
+        }
 
         return res.status(500).json({
             success: false,
