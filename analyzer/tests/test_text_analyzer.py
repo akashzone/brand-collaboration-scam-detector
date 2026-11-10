@@ -108,6 +108,37 @@ class TestTextAnalyzer(unittest.TestCase):
             "social_account_access",
             [item["id"] for item in result["indicators"]]
         )
+    
+    def test_negated_shipping_fee_is_not_flagged(self):
+        result = analyze_text(
+            "We never ask creators to pay a shipping fee."
+        )
+
+        self.assertNotIn(
+            "shipping_fee_request",
+            [item["id"] for item in result["indicators"]]
+        )
+
+    def test_negated_credential_request_is_not_flagged(self):
+        result = analyze_text(
+            "We do not request your password."
+        )
+
+        self.assertNotIn(
+            "credential_request",
+            [item["id"] for item in result["indicators"]]
+        )
+
+    def test_positive_shipping_fee_request_is_still_detected(self):
+        result = analyze_text(
+            "Please pay a shipping fee before dispatch."
+        )
+
+        self.assertIn(
+            "shipping_fee_request",
+            [item["id"] for item in result["indicators"]]
+        )
+
 
 
 if __name__ == "__main__":

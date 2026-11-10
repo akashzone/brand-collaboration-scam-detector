@@ -78,6 +78,35 @@ DETECTION_RULES = [
 ]
 
 
+def is_negated_request(message: str, match_start: int) -> bool:
+    # Find the beginning of the current sentence.
+    previous_text = message[:match_start]
+
+    sentence_start = max(
+        previous_text.rfind("."),
+        previous_text.rfind("!"),
+        previous_text.rfind("?"),
+        previous_text.rfind(";"),
+        previous_text.rfind("\n")
+    ) + 1
+
+    context = previous_text[sentence_start:]
+
+    negation_pattern = (
+        r"\b(?:we|our team|the brand)\s+"
+        r"(?:never|do not|don't|does not|doesn't)\s+"
+        r"(?:ask|asks|request|requests|require|requires)\b"
+    )
+
+    return bool(
+        re.search(
+            negation_pattern,
+            context,
+            re.IGNORECASE
+        )
+    )
+
+
 def analyze_text(message: str) -> dict:
     indicators = []
 
@@ -91,6 +120,9 @@ def analyze_text(message: str) -> dict:
         evidence = []
 
         for match in matches:
+            if is_negated_request(message, match.start()):
+                continue
+            
             matched_text = match.group(0)
 
             if matched_text.lower() not in [
