@@ -88,6 +88,27 @@ class TestTextAnalyzer(unittest.TestCase):
             len(urgency_indicator["evidence"]),
             3
         )
+    
+    def test_shipping_fee_detection(self):
+        result = analyze_text(
+            "Please pay a shipping fee before dispatch."
+        )
+
+        self.assertIn(
+            "shipping_fee_request",
+            [item["id"] for item in result["indicators"]]
+        )
+
+    def test_social_account_access_detection(self):
+        result = analyze_text(
+            "Please add us as an admin to your Instagram account."
+        )
+
+        self.assertIn(
+            "social_account_access",
+            [item["id"] for item in result["indicators"]]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

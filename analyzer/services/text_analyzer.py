@@ -26,6 +26,32 @@ DETECTION_RULES = [
             r"pay (?:a )?fee|payment required)\b"
         )
     },
+
+    {
+        "id": "shipping_fee_request",
+        "category": "financial_request",
+        "severity": "medium",
+        "description": "The message requests payment for shipping, delivery, or courier charges.",
+        "pattern": (
+            r"\b(shipping fee|shipping charges|"
+            r"delivery fee|delivery charges|"
+            r"courier fee|courier charges|"
+            r"pay for shipping|pay shipping costs)\b"
+        )
+    },
+    {
+        "id": "social_account_access",
+        "category": "account_security",
+        "severity": "high",
+        "description": "The message requests access or administrative control of a social media account.",
+        "pattern": (
+            r"\b(add us as (?:an )?admin|"
+            r"make us (?:an )?admin|"
+            r"grant us access|"
+            r"connect your Instagram account|"
+            r"authorize our app)\b"
+        )
+    },
     {
         "id": "credential_request",
         "category": "credential_theft",
@@ -33,7 +59,9 @@ DETECTION_RULES = [
         "description": "The message requests sensitive account information.",
         "pattern": (
             r"\b(password|login credentials|"
-            r"verification code|one[- ]time password|"
+            r"verification code|security code|"
+            r"login code|access code|"
+            r"one[- ]time password|"
             r"OTP|2FA code|account access)\b"
         )
     },
@@ -64,7 +92,7 @@ def analyze_text(message: str) -> dict:
 
         for match in matches:
             matched_text = match.group(0)
-            
+
             if matched_text.lower() not in [
                 item.lower() for item in evidence
             ]:
