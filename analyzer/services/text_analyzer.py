@@ -54,22 +54,33 @@ def analyze_text(message: str) -> dict:
     indicators = []
 
     for rule in DETECTION_RULES:
-        match = re.search(
+        matches = re.finditer(
             rule["pattern"],
             message,
             re.IGNORECASE
         )
 
-        if match:
+        evidence = []
+
+        for match in matches:
+            matched_text = match.group(0)
+            
+            if matched_text.lower() not in [
+                item.lower() for item in evidence
+            ]:
+                evidence.append(matched_text)
+
+        if evidence:
             indicators.append({
                 "id": rule["id"],
                 "category": rule["category"],
                 "severity": rule["severity"],
                 "description": rule["description"],
-                "evidence": match.group(0)
+                "evidence": evidence
             })
 
     return {
         "indicatorCount": len(indicators),
         "indicators": indicators
     }
+

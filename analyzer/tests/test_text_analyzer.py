@@ -72,7 +72,22 @@ class TestTextAnalyzer(unittest.TestCase):
         )
 
         self.assertGreaterEqual(result["indicatorCount"], 3)
+    
+    def test_multiple_matches_for_same_rule(self):
+        result = analyze_text(
+            "Act now! This offer expires today! "
+            "Respond immediately."
+        )
 
+        urgency_indicator = next(
+            item for item in result["indicators"]
+            if item["id"] == "urgency_language"
+        )
+        print("Detected urgency evidence:", urgency_indicator["evidence"])
+        self.assertEqual(
+            len(urgency_indicator["evidence"]),
+            3
+        )
 
 if __name__ == "__main__":
     unittest.main()
