@@ -3,7 +3,8 @@ import unittest
 
 from services.text_analyzer import (
     analyze_text,
-    generate_text_summary
+    generate_text_summary,
+    check_brand_domains
 )
 
 
@@ -251,6 +252,49 @@ class TestTextAnalyzer(unittest.TestCase):
             len(result["entities"]["emailAddresses"]),
             1
         )
+        
+
+    def test_official_brand_domain_match(self):
+        message = "Hello! We are collaborating with Nike. Visit https://www.nike.com"
+
+        result = analyze_text(message)
+
+        nike_check = next(
+            check for check in result["brandDomainChecks"]
+            if check["brand"] == "Nike"
+        )
+
+        self.assertTrue(nike_check["matchesOfficialDomain"])
+
+
+    def test_suspicious_brand_domain_mismatch(self):
+        message = "We are from Nike. Apply here: https://nike-partnerships-example.com"
+
+        result = analyze_text(message)
+
+        nike_check = next(
+            check for check in result["brandDomainChecks"]
+            if check["brand"] == "Nike"
+        )
+
+        self.assertFalse(nike_check["matchesOfficialDomain"])
+
+
+    def test_brand_mention_without_domain(self):
+        message = "Hello! We are offering you a collaboration opportunity with Nike."
+
+        result = analyze_text(message)
+
+        self.assertEqual(result["brandDomainChecks"], [])
+
+
+    def test_unknown_brand_is_not_checked(self):
+        message = "Hello! We are collaborating with Samsung. Visit https://samsung.com"
+
+        result = analyze_text(message)
+
+        self.assertEqual(result["brandDomainChecks"], [])
+
 
 
 if __name__ == "__main__":

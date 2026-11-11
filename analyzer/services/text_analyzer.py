@@ -1,6 +1,8 @@
 
 import re
 
+from urllib.parse import urlparse
+from services.brand_catalog import BRAND_DOMAINS
 
 URL_PATTERN = re.compile(
     r"\b(?:https?://|www\.)[^\s<>()]+",
@@ -89,6 +91,69 @@ DETECTION_RULES = [
 ]
 
 
+def extract_domains(entities: dict) -> list:
+    domains = []
+
+    # Extract domains from URLs
+    for url in entities["urls"]:
+        parsed_url = urlparse(url)
+
+        domain = parsed_url.netloc.lower()
+
+        # Remove www. prefix
+        if domain.startswith("www."):
+            domain = domain[4:]
+
+        if domain:
+            domains.append(domain)
+
+    # Extract domains from email addresses
+    for email in entities["emailAddresses"]:
+        domain = email.split("@")[-1].lower()
+
+        if domain.startswith("www."):
+            domain = domain[4:]
+
+        if domain:
+            domains.append(domain)
+
+    # Remove duplicates
+    return list(dict.fromkeys(domains))
+
+
+def check_brand_domains(message: str, domains: list) -> list:
+    brand_checks = []
+
+    for brand, details in BRAND_DOMAINS.items():
+
+        # Check whether the brand is mentioned in the message
+        brand_pattern = rf"\b{re.escape(brand)}\b"
+
+        if not re.search(brand_pattern, message, re.IGNORECASE):
+            continue
+
+        official_domains = details["official_domains"]
+
+        for domain in domains:
+
+            # Check whether the extracted domain matches
+            # an official domain or its subdomain
+            is_official = any(
+                domain == official_domain
+                or domain.endswith("." + official_domain)
+                for official_domain in official_domains
+            )
+
+            brand_checks.append({
+                "brand": brand.title(),
+                "domain": domain,
+                "matchesOfficialDomain": is_official,
+                "expectedDomains": official_domains
+            })
+
+    return brand_checks
+
+
 def extract_entities(message: str) -> dict:
     # Extract URLs
     urls = URL_PATTERN.findall(message)
@@ -155,6 +220,13 @@ def analyze_text(message: str) -> dict:
     indicators = []
     entities = extract_entities(message)
 
+    domains = extract_domains(entities)
+
+    brand_checks = check_brand_domains(
+        message,
+        domains
+    )
+
     for rule in DETECTION_RULES:
         matches = re.finditer(
             rule["pattern"],
@@ -187,7 +259,8 @@ def analyze_text(message: str) -> dict:
     return {
     "indicatorCount": len(indicators),
     "indicators": indicators,
-    "entities": entities
+    "entities": entities,
+    "brandDomainChecks": brand_checks
     }
 
 
@@ -239,4 +312,3 @@ def generate_text_summary(indicators: list) -> dict:
         "classification": classification,
         "explanation": explanation
     }
-
