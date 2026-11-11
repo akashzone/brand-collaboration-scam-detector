@@ -144,3 +144,53 @@ def analyze_text(message: str) -> dict:
         "indicators": indicators
     }
 
+
+def generate_text_summary(indicators: list) -> dict:
+    severity_counts = {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+    }
+
+    for indicator in indicators:
+        severity = indicator["severity"].lower()
+
+        if severity in severity_counts:
+            severity_counts[severity] += 1
+
+    total_indicators = len(indicators)
+
+    # Determine the preliminary text risk classification.
+    if severity_counts["high"] > 0:
+        classification = "High"
+
+    elif severity_counts["medium"] > 0:
+        classification = "Medium"
+
+    elif severity_counts["low"] > 0:
+        classification = "Low"
+
+    else:
+        classification = "No indicators"
+
+    # Generate an explanation.
+    if total_indicators == 0:
+        explanation = (
+            "No known suspicious patterns were detected "
+            "in the submitted message."
+        )
+    else:
+        explanation = (
+            f"Detected {total_indicators} suspicious "
+            f"indicator(s): {severity_counts['high']} high, "
+            f"{severity_counts['medium']} medium, and "
+            f"{severity_counts['low']} low severity."
+        )
+
+    return {
+        "totalIndicators": total_indicators,
+        "severityCounts": severity_counts,
+        "classification": classification,
+        "explanation": explanation
+    }
+

@@ -1,7 +1,10 @@
 
 import unittest
 
-from services.text_analyzer import analyze_text
+from services.text_analyzer import (
+    analyze_text,
+    generate_text_summary
+)
 
 
 class TestTextAnalyzer(unittest.TestCase):
@@ -138,6 +141,61 @@ class TestTextAnalyzer(unittest.TestCase):
             "shipping_fee_request",
             [item["id"] for item in result["indicators"]]
         )
+    
+    def test_summary_with_no_indicators(self):
+        result = generate_text_summary([])
+
+        self.assertEqual(result["totalIndicators"], 0)
+        self.assertEqual(
+            result["classification"],
+            "No indicators"
+        )
+
+    def test_summary_with_high_severity(self):
+        indicators = [
+            {"severity": "high"},
+            {"severity": "medium"},
+            {"severity": "high"}
+        ]
+
+        result = generate_text_summary(indicators)
+
+        self.assertEqual(result["totalIndicators"], 3)
+        self.assertEqual(
+            result["severityCounts"]["high"],
+            2
+        )
+        self.assertEqual(
+            result["classification"],
+            "High"
+        )
+
+    def test_summary_with_medium_severity(self):
+        indicators = [
+            {"severity": "medium"},
+            {"severity": "low"}
+        ]
+
+        result = generate_text_summary(indicators)
+
+        self.assertEqual(
+            result["classification"],
+            "Medium"
+        )
+
+    def test_summary_with_only_low_severity(self):
+        indicators = [
+            {"severity": "low"},
+            {"severity": "low"}
+        ]
+
+        result = generate_text_summary(indicators)
+
+        self.assertEqual(
+            result["classification"],
+            "Low"
+        )
+        self.assertEqual(result["totalIndicators"], 2)
 
 
 

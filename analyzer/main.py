@@ -2,7 +2,10 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, field_validator
 
-from services.text_analyzer import analyze_text
+from services.text_analyzer import (
+    analyze_text,
+    generate_text_summary
+)
 
 # Initialize FastAPI
 app = FastAPI(
@@ -54,13 +57,17 @@ def analyze_message(request: AnalyzeRequest):
     message = request.message
 
     analysis_result = analyze_text(message)
+    text_summary = generate_text_summary(
+    analysis_result["indicators"]
+    )
 
     return {
-        "success": True,
-        "data": {
-            "message": message,
-            "characterCount": len(message),
-            "status": "analysis_completed",
-            "textAnalysis": analysis_result
+    "success": True,
+    "data": {
+        "message": message,
+        "characterCount": len(message),
+        "status": "analysis_completed",
+        "textAnalysis": analysis_result,
+        "textSummary": text_summary
         }
     }
