@@ -198,6 +198,60 @@ class TestTextAnalyzer(unittest.TestCase):
         self.assertEqual(result["totalIndicators"], 2)
 
 
+    def test_url_extraction(self):
+        result = analyze_text(
+            "Visit https://example.com/collab for details."
+        )
+
+        self.assertIn(
+            "https://example.com/collab",
+            result["entities"]["urls"]
+        )
+
+    def test_email_extraction(self):
+        result = analyze_text(
+            "Contact us at partnerships@example.com"
+        )
+
+        self.assertIn(
+            "partnerships@example.com",
+            result["entities"]["emailAddresses"]
+        )
+
+    def test_multiple_entity_extraction(self):
+        result = analyze_text(
+            "Contact hello@example.com or "
+            "support@example.com. Visit "
+            "https://example.com and www.brand.com."
+        )
+
+        self.assertEqual(
+            len(result["entities"]["emailAddresses"]),
+            2
+        )
+
+        self.assertEqual(
+            len(result["entities"]["urls"]),
+            2
+        )
+
+    def test_duplicate_entity_removal(self):
+        result = analyze_text(
+            "Visit https://example.com and "
+            "https://example.com. Contact "
+            "hello@example.com or HELLO@example.com."
+        )
+
+        self.assertEqual(
+            len(result["entities"]["urls"]),
+            1
+        )
+
+        self.assertEqual(
+            len(result["entities"]["emailAddresses"]),
+            1
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

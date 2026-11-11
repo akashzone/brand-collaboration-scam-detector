@@ -2,6 +2,17 @@
 import re
 
 
+URL_PATTERN = re.compile(
+    r"\b(?:https?://|www\.)[^\s<>()]+",
+    re.IGNORECASE
+)
+
+EMAIL_PATTERN = re.compile(
+    r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b",
+    re.IGNORECASE
+)
+
+
 # Suspicious patterns to identify in collaboration messages
 DETECTION_RULES = [
     {
@@ -78,6 +89,39 @@ DETECTION_RULES = [
 ]
 
 
+def extract_entities(message: str) -> dict:
+    # Extract URLs
+    urls = URL_PATTERN.findall(message)
+
+    # Remove punctuation accidentally captured at the end.
+    urls = [
+        url.rstrip(".,!?;:")
+        for url in urls
+    ]
+
+    # Extract email addresses
+    email_addresses = EMAIL_PATTERN.findall(message)
+
+    # Remove duplicate entries without changing original casing.
+    def remove_duplicates(items):
+        unique_items = []
+        seen = set()
+
+        for item in items:
+            normalized = item.lower()
+
+            if normalized not in seen:
+                seen.add(normalized)
+                unique_items.append(item)
+
+        return unique_items
+
+    return {
+        "urls": remove_duplicates(urls),
+        "emailAddresses": remove_duplicates(email_addresses)
+    }
+
+
 def is_negated_request(message: str, match_start: int) -> bool:
     # Find the beginning of the current sentence.
     previous_text = message[:match_start]
@@ -109,6 +153,7 @@ def is_negated_request(message: str, match_start: int) -> bool:
 
 def analyze_text(message: str) -> dict:
     indicators = []
+    entities = extract_entities(message)
 
     for rule in DETECTION_RULES:
         matches = re.finditer(
@@ -140,8 +185,9 @@ def analyze_text(message: str) -> dict:
             })
 
     return {
-        "indicatorCount": len(indicators),
-        "indicators": indicators
+    "indicatorCount": len(indicators),
+    "indicators": indicators,
+    "entities": entities
     }
 
 
