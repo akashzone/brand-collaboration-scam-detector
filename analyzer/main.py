@@ -7,6 +7,8 @@ from services.text_analyzer import (
     generate_text_summary
 )
 
+from services.url_analyzer import analyze_url
+
 # Initialize FastAPI
 app = FastAPI(
     title="Scam Detector Analyzer",
@@ -56,18 +58,31 @@ def health_check():
 def analyze_message(request: AnalyzeRequest):
     message = request.message
 
-    analysis_result = analyze_text(message)
+    # Step 1: Analyze the message
+    text_analysis = analyze_text(message)
+
+    # Step 2: Generate the text analysis summary
     text_summary = generate_text_summary(
-    analysis_result["indicators"]
+        text_analysis["indicators"]
     )
 
+    # Step 3: Extract URLs from the message
+    extracted_urls = text_analysis.get(
+        "entities", {}
+    ).get("urls", [])
+
+    # Step 4: Analyze every extracted URL
+    url_analysis = [
+        analyze_url(url)
+        for url in extracted_urls
+    ]
+
+    # Step 5: Return combined results
     return {
-    "success": True,
-    "data": {
-        "message": message,
-        "characterCount": len(message),
-        "status": "analysis_completed",
-        "textAnalysis": analysis_result,
-        "textSummary": text_summary
+        "success": True,
+        "data": {
+            "textAnalysis": text_analysis,
+            "textSummary": text_summary,
+            "urlAnalysis": url_analysis
         }
     }
