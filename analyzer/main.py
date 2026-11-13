@@ -8,6 +8,7 @@ from services.text_analyzer import (
 )
 
 from services.url_analyzer import analyze_url
+from services.llm_analyzer import analyze_message_with_llm
 
 # Initialize FastAPI
 app = FastAPI(
@@ -77,12 +78,29 @@ def analyze_message(request: AnalyzeRequest):
         for url in extracted_urls
     ]
 
+        # LLM-based analysis
+    try:
+        llm_result = analyze_message_with_llm(message)
+
+        llm_analysis = {
+            "status": "completed",
+            "data": llm_result
+        }
+
+    except RuntimeError:
+        llm_analysis = {
+            "status": "unavailable",
+            "message": "LLM analysis is temporarily unavailable."
+        }
+        
+
     # Step 5: Return combined results
     return {
         "success": True,
         "data": {
             "textAnalysis": text_analysis,
             "textSummary": text_summary,
-            "urlAnalysis": url_analysis
+            "urlAnalysis": url_analysis,
+            "llmAnalysis": llm_analysis
         }
     }
