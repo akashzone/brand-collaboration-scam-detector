@@ -1,10 +1,28 @@
-# Brand Collaboration Scam Detector 🛡️
+# 🛡️ Brand Collaboration Scam Detector
 
-An intelligent security tool designed to help content creators identify fraudulent brand collaboration offers, phishing attempts, and suspicious partnership communications.
+An AI-powered security analysis platform designed to help content creators identify fraudulent brand collaboration offers, phishing attempts, and suspicious partnership communications.
 
-The application analyzes collaboration messages, suspicious URLs, domains, and attachments to help creators make informed decisions before interacting with potentially malicious offers.
+The application analyzes collaboration messages, URLs, and suspicious communication patterns using rule-based detection, AI-powered analysis, and URL security checks to help creators make informed decisions before interacting with potentially malicious offers.
 
-> **Project Status:** Under Development 🚧
+**Project Status:** Under Active Development 🚧
+
+---
+
+## 📌 Table of Contents
+
+- [Problem Statement](#-problem-statement)
+- [Project Objectives](#-project-objectives)
+- [Features](#-features)
+- [System Architecture](#️-system-architecture)
+- [Technology Stack](#️-technology-stack)
+- [Project Structure](#-project-structure)
+- [Getting Started](#️-getting-started)
+- [API Documentation](#-api-documentation)
+- [Risk Assessment](#-risk-assessment)
+- [Development Roadmap](#️-development-roadmap)
+- [Security Considerations](#-security-considerations)
+- [Learning Outcomes](#-learning-outcomes)
+- [Disclaimer](#️-disclaimer)
 
 ---
 
@@ -18,9 +36,10 @@ Unfortunately, scammers exploit these opportunities by impersonating legitimate 
 - Fake brand identities and impersonation attempts.
 - Malicious attachments and media kits.
 - Suspicious domains resembling legitimate company websites.
-- Requests for personal information, credentials, or payments.
+- Requests for personal information, credentials, or upfront payments.
+- Artificial urgency and psychological manipulation.
 
-Many creators may not have the technical knowledge required to identify these threats.
+Many creators lack the technical knowledge required to identify these threats.
 
 **Brand Collaboration Scam Detector** aims to address this problem by providing an intelligent platform that analyzes suspicious collaboration communications and explains potential security risks.
 
@@ -29,8 +48,9 @@ Many creators may not have the technical knowledge required to identify these th
 ## 🎯 Project Objectives
 
 - Analyze suspicious brand collaboration messages.
-- Identify potentially fraudulent communication patterns.
-- Detect suspicious URLs and domain impersonation.
+- Identify fraudulent communication patterns using rule-based detection.
+- Use LLMs to understand contextual scam indicators.
+- Detect suspicious URLs and potential brand impersonation.
 - Extract text from uploaded screenshots using OCR.
 - Investigate suspicious websites in a controlled environment.
 - Integrate external threat intelligence services.
@@ -39,71 +59,164 @@ Many creators may not have the technical knowledge required to identify these th
 
 ---
 
-## ✨ Planned Features
+## ✨ Features
 
-The following features are planned for the project. They are not all implemented yet.
+### ✅ Implemented Features
 
-### 1. Message Analysis
+The following capabilities have been implemented in the current development stage.
+
+**1. Message Analysis**
 - Analyze suspicious collaboration messages.
-- Identify urgency, suspicious payment requests, and impersonation indicators.
-- Use LLM-assisted analysis and rule-based detection.
+- Detect urgency and pressure tactics.
+- Identify upfront payment requests.
+- Detect credential and sensitive information requests.
+- Identify suspicious off-platform communication.
+- Extract URLs and email addresses from messages.
+- Perform basic brand-domain mismatch checks.
 
-### 2. URL and Domain Intelligence
-- Inspect suspicious URLs.
-- Identify potentially malicious domains.
-- Investigate domain age and domain impersonation.
-- Integrate VirusTotal and Google Safe Browsing.
+**2. AI-Powered Analysis**
+- Gemini API integration.
+- Contextual analysis of collaboration messages.
+- Scam likelihood classification.
+- AI-generated risk score.
+- Identification of suspicious evidence.
+- Recommended actions for users.
+- Graceful handling of unavailable LLM services.
 
-### 3. Screenshot and Attachment Analysis
-- Extract text from screenshots using OCR.
-- Inspect suspicious files and media kits.
-- Identify potentially dangerous content.
+**3. URL Security Analysis**
+- URL normalization and validation.
+- IP-based URL detection.
+- Known URL shortener detection.
+- Suspicious URL pattern detection.
+- HTTP and HTTPS protocol checks.
+- Basic brand impersonation checks.
 
-### 4. Website Security Analysis
-- Analyze suspicious websites using Playwright.
+**4. Risk Scoring Engine — In Progress**
+- Weighted risk-scoring architecture.
+- Text component scoring.
+- URL component scoring.
+- Unified risk assessment integration in progress.
+
+**5. Backend Architecture**
+- Node.js and Express REST API.
+- Python and FastAPI analysis service.
+- Express-to-FastAPI communication.
+- Request validation and error handling.
+- Modular controllers, routes, and services.
+
+**6. Testing**
+- Unit tests for text analysis.
+- Unit tests for URL analysis.
+- Mocked unit tests for Gemini integration.
+- Unit tests for the risk-scoring engine.
+
+### 🚧 Planned Features
+
+**1. Domain Intelligence**
+- Domain age investigation using RDAP.
+- Typosquatting and suspicious domain detection.
+- VirusTotal integration.
+- Google Safe Browsing integration.
+
+**2. Screenshot and Attachment Analysis**
+- OCR using Tesseract.
+- Extract text from collaboration screenshots.
+- Inspect suspicious attachments and media kits.
+- Identify potentially dangerous file types.
+
+**3. Website Security Analysis**
+- Browser automation using Playwright.
 - Investigate redirects and suspicious website behavior.
-- Execute browser inspection in a controlled, isolated environment.
+- Analyze websites in an isolated environment.
 
-### 5. Risk Assessment
-- Generate an explainable risk score between 0 and 100.
-- Highlight suspicious indicators.
-- Provide recommendations based on identified risks.
+**4. Reporting and Community Intelligence**
+- Downloadable security analysis reports.
+- Community-based scam reporting.
+- Database of reported suspicious domains and campaigns.
 
-### 6. Reporting and Community Intelligence
-- Generate downloadable analysis reports.
-- Allow users to report suspicious collaboration attempts.
-- Maintain a community-driven database of reported threats.
+**5. Frontend Application**
+- React-based user interface.
+- Message and URL submission.
+- File and screenshot uploads.
+- Visual risk assessment dashboard.
+- Detailed analysis results.
 
 ---
 
 ## 🏗️ System Architecture
 
-The application follows a modular architecture consisting of three primary components.
+The application follows a modular architecture consisting of a React frontend, Node.js backend, Python analysis service, and database.
+
+### Current Backend Architecture
 
 ```text
-             User
-              |
-              v
-       React Frontend
-              |
-              v
-      Node.js / Express
-         Main Backend
-              |
-       ----------------
-       |              |
-       v              v
-  PostgreSQL      Python Analyzer
-  Database          FastAPI
-                       |
-              -----------------
-              |       |       |
-              v       v       v
-             LLM     OCR   Security
-                            Analysis
+                User
+                  |
+                  v
+          Node.js / Express
+             Main API
+                  |
+                  v
+           Axios HTTP Request
+                  |
+                  v
+           Python / FastAPI
+                  |
+        -----------------------
+        |          |          |
+        v          v          v
+   Rule-Based    URL       Gemini
+     Analysis  Analysis    LLM API
+        |          |          |
+        -----------------------
+                  |
+                  v
+          Analysis Results
+                  |
+                  v
+          Express Backend
+                  |
+                  v
+              Response
 ```
 
-The Express backend acts as the central communication layer, while the Python analyzer will handle specialized analysis operations.
+### Planned Complete Architecture
+
+```text
+                 User
+                   |
+                   v
+             React Frontend
+                   |
+                   v
+           Node.js / Express
+              Main Backend
+                   |
+          ---------------------
+          |                   |
+          v                   v
+      PostgreSQL        Python Analyzer
+       Database             FastAPI
+                               |
+                  ------------------------
+                  |          |           |
+                  v          v           v
+              Text/LLM      OCR       URL Security
+               Analysis   Analysis      Analysis
+                  |          |           |
+                  ------------------------
+                               |
+                               v
+                       Risk Assessment
+                               |
+                               v
+                      Analysis Results
+                               |
+                               v
+                         Frontend
+```
+
+The Express backend acts as the central communication layer, while the Python analyzer handles specialized analysis operations.
 
 ---
 
@@ -112,17 +225,21 @@ The Express backend acts as the central communication layer, while the Python an
 | Technology | Purpose |
 |---|---|
 | React | Frontend development |
+| Tailwind CSS | Frontend styling |
 | Node.js | Backend runtime |
 | Express.js | REST API development |
+| Axios | HTTP communication |
 | Python | Analysis engine |
 | FastAPI | Python API framework |
+| Pydantic | Data validation |
+| Gemini API | AI-powered message analysis |
 | PostgreSQL | Database |
 | Prisma | Database ORM |
 | Playwright | Browser automation |
 | Tesseract OCR | Text extraction |
 | VirusTotal API | Threat intelligence |
 | Google Safe Browsing | URL threat detection |
-| LLM API | Intelligent message analysis |
+| RDAP | Domain registration information |
 | Git & GitHub | Version control |
 
 *Some technologies are planned for future implementation.*
@@ -134,26 +251,54 @@ The Express backend acts as the central communication layer, while the Python an
 ```text
 scam-detector/
 │
-├── frontend/                 # React application
+├── frontend/                     # React frontend (in development)
 │
-├── backend/                  # Node.js + Express API
+├── backend/                      # Node.js + Express API
+│   │
 │   ├── src/
 │   │   ├── controllers/
+│   │   │   ├── analyzeController.js
+│   │   │   └── healthController.js
+│   │   │
 │   │   ├── routes/
+│   │   │   ├── analyzeRoutes.js
+│   │   │   └── healthRoutes.js
+│   │   │
 │   │   ├── services/
+│   │   │   └── analyzeService.js
+│   │   │
 │   │   └── server.js
+│   │
 │   ├── .env
 │   ├── package.json
 │   └── package-lock.json
 │
-├── analyzer/                 # Python analysis service
+├── analyzer/                     # Python analysis service
+│   │
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── text_analyzer.py
+│   │   ├── brand_catalog.py
+│   │   ├── url_analyzer.py
+│   │   ├── llm_analyzer.py
+│   │   └── risk_scorer.py
+│   │
+│   ├── tests/
+│   │   ├── test_text_analyzer.py
+│   │   ├── test_url_analyzer.py
+│   │   ├── test_llm_analyzer.py
+│   │   └── test_risk_scorer.py
+│   │
 │   ├── .venv/
+│   ├── .env
 │   ├── main.py
 │   └── requirements.txt
 │
 ├── .gitignore
 └── README.md
 ```
+
+*The `.venv` and `.env` directories/files are local development resources and should not be committed to Git.*
 
 ---
 
@@ -167,7 +312,9 @@ Make sure you have the following installed:
 - npm
 - Python 3
 - Git
-- PostgreSQL (for future database integration)
+- A Gemini API key
+
+PostgreSQL will be required when database integration is implemented.
 
 ### 1. Clone the repository
 
@@ -181,8 +328,15 @@ cd brand-collaboration-scam-detector
 
 ### 2. Set up the Node.js backend
 
+Navigate to the backend directory:
+
 ```bash
 cd backend
+```
+
+Install dependencies:
+
+```bash
 npm install
 ```
 
@@ -190,15 +344,16 @@ Create a `.env` file inside the `backend` directory:
 
 ```env
 PORT=5000
+ANALYZER_URL=http://localhost:8000
 ```
 
-Start the backend:
+Start the Express server:
 
 ```bash
 npm run dev
 ```
 
-The Express server will run at:
+The Express backend will run at:
 
 `http://localhost:5000`
 
@@ -222,13 +377,22 @@ Activate it on Windows PowerShell:
 .\.venv\Scripts\Activate.ps1
 ```
 
-Install dependencies:
+Install Python dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-Start the FastAPI server:
+Create a `.env` file inside the `analyzer` directory:
+
+```env
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+GEMINI_MODEL=gemini-3.6-flash
+```
+
+Replace the placeholder with your own API key. Never commit this file to GitHub.
+
+Start the FastAPI service:
 
 ```bash
 python -m uvicorn main:app --reload --port 8000
@@ -238,9 +402,25 @@ The Python analyzer will run at:
 
 `http://localhost:8000`
 
+### 4. Verify the services
+
+**Express backend:**
+
+`http://localhost:5000/api/health`
+
+**Python analyzer:**
+
+`http://localhost:8000/health`
+
+**FastAPI Swagger documentation:**
+
+`http://localhost:8000/docs`
+
+Keep both backend services running when testing the complete analysis flow through Express.
+
 ---
 
-## 🔌 Currently Available API Endpoints
+## 🔌 API Documentation
 
 ### Node.js Backend
 
@@ -248,7 +428,7 @@ The Python analyzer will run at:
 |---|---|---|
 | GET | `/` | Backend welcome message |
 | GET | `/api/health` | Backend health check |
-| POST | `/api/analyze` | Accepts and validates a suspicious message |
+| POST | `/api/analyze` | Accepts and forwards a suspicious message for analysis |
 
 ### Python Analyzer
 
@@ -256,7 +436,7 @@ The Python analyzer will run at:
 |---|---|---|
 | GET | `/` | Analyzer welcome message |
 | GET | `/health` | Analyzer health check |
-| POST | `/analyze` | Accepts and validates a message |
+| POST | `/analyze` | Performs message, URL, and LLM analysis |
 
 ### Example Request
 
@@ -264,48 +444,165 @@ The Python analyzer will run at:
 
 ```json
 {
-  "message": "We are XYZ Brand. We would love to collaborate with you."
+  "message": "Congratulations! You have been selected for an exclusive brand collaboration. Pay a registration fee immediately and share your Instagram login credentials for verification. Contact us through WhatsApp: https://bit.ly/example-link"
 }
 ```
 
-### Example Response
+### Current Analysis Response Structure
+
+The Python analyzer currently returns a combined response containing:
 
 ```json
 {
   "success": true,
   "data": {
-    "message": "We are XYZ Brand. We would love to collaborate with you.",
-    "characterCount": 56,
-    "status": "received"
+    "textAnalysis": {
+      "indicatorCount": 3,
+      "indicators": [],
+      "entities": {
+        "urls": [],
+        "emailAddresses": []
+      },
+      "brandDomainChecks": []
+    },
+    "textSummary": {
+      "totalIndicators": 3,
+      "severityCounts": {
+        "high": 2,
+        "medium": 1,
+        "low": 0
+      },
+      "classification": "High"
+    },
+    "urlAnalysis": [],
+    "llmAnalysis": {
+      "status": "completed",
+      "data": {
+        "scam_likelihood": "high",
+        "risk_score": 98,
+        "summary": "Example analysis summary.",
+        "indicators": [],
+        "recommended_actions": []
+      }
+    }
   }
 }
 ```
 
-**Note:** The current endpoints demonstrate request handling and input validation. Actual scam detection and risk assessment are planned for subsequent development stages.
+*This is an illustrative response structure. Actual results depend on the submitted message and the availability of the Gemini service.*
+
+The unified `riskAssessment` response is currently under development.
+
+---
+
+## 📊 Risk Assessment
+
+The project uses a weighted scoring approach to combine different analysis results into a single risk assessment.
+
+### Current Temporary Scoring Weights
+
+| Component | Weight |
+|---|---:|
+| Text Analysis | 15% |
+| URL Analysis | 35% |
+| Gemini LLM Analysis | 50% |
+| **Total** | **100%** |
+
+These are provisional weights for the current development stage.
+
+The planned complete scoring architecture will also incorporate domain intelligence and sandbox analysis.
+
+### Risk Classification
+
+| Risk Score | Risk Level |
+|---|---|
+| 0–29 | Low |
+| 30–59 | Medium |
+| 60–79 | High |
+| 80–100 | Critical |
+
+A low risk score does not guarantee that a message or website is safe. It only indicates that the implemented analysis detected fewer or less severe risk indicators.
 
 ---
 
 ## 🗺️ Development Roadmap
 
-- [x] Project initialization
-- [x] Express backend setup
-- [x] Backend routes and controllers
-- [x] Message analysis API with input validation
-- [x] Python analyzer initialization
-- [ ] Connect Node.js backend with Python analyzer
-- [ ] Implement message analysis logic
-- [ ] Implement rule-based scam detection
-- [ ] Integrate LLM-based analysis
-- [ ] Implement URL and domain intelligence
-- [ ] Integrate external threat intelligence APIs
-- [ ] Implement screenshot OCR
-- [ ] Implement Playwright website analysis
-- [ ] Develop explainable risk scoring
-- [ ] Build React frontend
-- [ ] Integrate PostgreSQL and Prisma
-- [ ] Generate downloadable security reports
-- [ ] Implement community threat reporting
-- [ ] Testing, evaluation, and deployment
+### Phase 1: Project Foundation
+- [x] Initialize project structure.
+- [x] Configure Git and GitHub.
+- [x] Set up Express backend.
+- [x] Implement routes and controllers.
+- [x] Create message analysis API.
+- [x] Implement input validation.
+
+### Phase 2: Python Analyzer
+- [x] Initialize FastAPI application.
+- [x] Connect Express with FastAPI.
+- [x] Implement rule-based text analysis.
+- [x] Implement text analysis summaries.
+- [x] Extract URLs and email addresses.
+- [x] Implement basic brand-domain checks.
+
+### Phase 3: Advanced Analysis
+- [x] Implement URL normalization.
+- [x] Detect IP-based URLs.
+- [x] Detect URL shorteners.
+- [x] Identify suspicious URL patterns.
+- [x] Implement HTTPS checks.
+- [x] Implement basic URL brand impersonation checks.
+- [x] Integrate Gemini LLM.
+- [x] Add Gemini unit tests.
+
+### Phase 4: Unified Risk Assessment
+- [x] Create risk-scoring module.
+- [x] Implement risk-level classification.
+- [x] Add risk-scoring unit tests.
+- [x] Implement text component scoring.
+- [ ] Implement URL component scoring.
+- [ ] Integrate component scores.
+- [ ] Add unified risk assessment to FastAPI response.
+- [ ] Test the complete scoring pipeline.
+
+### Phase 5: Domain Intelligence
+- [ ] Implement domain age analysis using RDAP.
+- [ ] Integrate VirusTotal.
+- [ ] Integrate Google Safe Browsing.
+- [ ] Improve brand impersonation and typosquatting detection.
+
+### Phase 6: Screenshot and Attachment Analysis
+- [ ] Integrate Tesseract OCR.
+- [ ] Support screenshot uploads.
+- [ ] Extract and analyze screenshot text.
+- [ ] Implement safe attachment inspection.
+
+### Phase 7: Website Security Analysis
+- [ ] Integrate Playwright.
+- [ ] Implement isolated browser inspection.
+- [ ] Analyze redirects and suspicious website behavior.
+- [ ] Add SSRF protection and network restrictions.
+
+### Phase 8: Frontend Development
+- [ ] Initialize React and Vite.
+- [ ] Configure Tailwind CSS.
+- [ ] Build the message analysis interface.
+- [ ] Display risk assessment results.
+- [ ] Build a detailed analysis dashboard.
+- [ ] Add screenshot and attachment uploads.
+
+### Phase 9: Database and Reporting
+- [ ] Integrate PostgreSQL.
+- [ ] Configure Prisma ORM.
+- [ ] Implement user and analysis data models.
+- [ ] Generate downloadable PDF reports.
+- [ ] Implement community threat reporting.
+
+### Phase 10: Testing and Deployment
+- [ ] Perform integration testing.
+- [ ] Evaluate detection accuracy and false positives.
+- [ ] Add security testing.
+- [ ] Configure Docker.
+- [ ] Deploy backend and frontend.
+- [ ] Complete project documentation.
 
 ---
 
@@ -315,29 +612,36 @@ Security is a central consideration in this project.
 
 Planned safeguards include:
 
-- Isolated execution for suspicious website analysis.
-- Protection against Server-Side Request Forgery (SSRF).
 - Input validation and sanitization.
-- Protection against prompt injection.
 - Secure API key and environment variable management.
+- Protection against prompt injection.
+- SSRF protection when inspecting external URLs.
+- Isolated execution for suspicious website analysis.
+- Safe handling of uploaded files and attachments.
 - Data minimization and retention controls.
-- Careful handling of uploaded files and external URLs.
+- Network restrictions for browser automation.
+- Careful handling of external API responses.
+
+URL inspection and automated website analysis must not be treated as safe merely because a URL uses HTTPS.
 
 ---
 
 ## 🎓 Learning Outcomes
 
-This project is intended to explore and demonstrate practical knowledge of:
+This project explores practical concepts in:
 
 - Full-stack application development.
 - REST API design and integration.
 - Backend architecture and modular programming.
 - Python and Node.js interoperability.
 - AI and LLM integration.
+- Rule-based detection systems.
 - Cybersecurity fundamentals.
+- URL and domain security analysis.
 - Browser automation and OCR.
+- Unit testing and error handling.
 - Database design and threat intelligence.
-- Git and collaborative development practices.
+- Git and GitHub version control.
 
 ---
 
@@ -345,7 +649,11 @@ This project is intended to explore and demonstrate practical knowledge of:
 
 This project is intended for educational and research purposes.
 
-Automated security analysis cannot guarantee that a collaboration offer, website, domain, or attachment is safe. Results should be treated as risk indicators rather than definitive security guarantees.
+Automated security analysis cannot guarantee that a collaboration offer, website, domain, or attachment is safe.
+
+The generated risk scores and classifications should be treated as indicators to support decision-making, not definitive security guarantees.
+
+Users should independently verify suspicious collaboration offers through official brand communication channels.
 
 ---
 
