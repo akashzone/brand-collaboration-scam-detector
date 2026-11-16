@@ -1,6 +1,5 @@
 
 import re
-
 from urllib.parse import urlparse
 from services.brand_catalog import BRAND_DOMAINS
 
