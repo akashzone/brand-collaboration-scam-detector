@@ -117,12 +117,18 @@ def calculate_text_component_score(text_analysis: dict) -> int:
 
 
 
+
+
+
 def calculate_url_component_score(url_analysis: list) -> int | None:
     """
-    Calculate a numerical risk score from URL analysis results.
+    Calculate URL risk using the highest individual URL score.
+
+    Invalid or incomplete URL analysis results are skipped.
+    Returns None if no valid URL analysis is available.
     """
 
-    total_score = 0
+    individual_scores = []
 
     url_points = {
         "ip_based": 30,
@@ -132,32 +138,78 @@ def calculate_url_component_score(url_analysis: list) -> int | None:
         "brand_impersonation": 30
     }
 
+    required_sections = {
+        "ipAnalysis": "isIpBased",
+        "shortenerAnalysis": "isShortened",
+        "suspiciousPatterns": "isSuspicious",
+        "httpsAnalysis": "isHttps"
+    }
+
     for result in url_analysis:
+
+        if not isinstance(result, dict):
+            continue
+
         if result.get("status") != "analysis_completed":
             continue
 
-        ip_analysis = result.get("ipAnalysis", {})
-        shortener_analysis = result.get("shortenerAnalysis", {})
-        suspicious_patterns = result.get("suspiciousPatterns", {})
-        https_analysis = result.get("httpsAnalysis", {})
+        # Validate all required analysis sections.
+        valid_result = True
+
+        for section, indicator in required_sections.items():
+            section_data = result.get(section)
+
+            if not isinstance(section_data, dict):
+                valid_result = False
+                break
+
+            if not isinstance(section_data.get(indicator), bool):
+                valid_result = False
+                break
+
+        if not valid_result:
+            continue
+
+        # Brand analysis is optional, but must be valid if provided.
         brand_analysis = result.get("brandAnalysis")
 
-        if ip_analysis.get("isIpBased"):
-            total_score += url_points["ip_based"]
+        if brand_analysis is not None:
+            if not isinstance(brand_analysis, dict):
+                continue
 
-        if shortener_analysis.get("isShortened"):
-            total_score += url_points["shortened"]
+            if not isinstance(
+                brand_analysis.get("matchesOfficialDomain"), bool
+            ):
+                continue
 
-        if suspicious_patterns.get("isSuspicious"):
-            total_score += url_points["suspicious_patterns"]
+        url_score = 0
 
-        if not https_analysis.get("isHttps"):
-            total_score += url_points["insecure_http"]
+        ip_analysis = result["ipAnalysis"]
+        shortener_analysis = result["shortenerAnalysis"]
+        suspicious_patterns = result["suspiciousPatterns"]
+        https_analysis = result["httpsAnalysis"]
 
-        if brand_analysis and brand_analysis.get("matchesOfficialDomain") is False:
-            total_score += url_points["brand_impersonation"]
+        if ip_analysis["isIpBased"]:
+            url_score += url_points["ip_based"]
 
-    if not url_analysis:
+        if shortener_analysis["isShortened"]:
+            url_score += url_points["shortened"]
+
+        if suspicious_patterns["isSuspicious"]:
+            url_score += url_points["suspicious_patterns"]
+
+        if not https_analysis["isHttps"]:
+            url_score += url_points["insecure_http"]
+
+        if (
+            brand_analysis is not None
+            and brand_analysis["matchesOfficialDomain"] is False
+        ):
+            url_score += url_points["brand_impersonation"]
+
+        individual_scores.append(min(url_score, 100))
+
+    if not individual_scores:
         return None
 
-    return min(total_score, 100)
+    return max(individual_scores)
