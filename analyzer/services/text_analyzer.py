@@ -95,6 +95,8 @@ def extract_domains(entities: dict) -> list:
 
     # Extract domains from URLs
     for url in entities["urls"]:
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
         parsed_url = urlparse(url)
 
         domain = parsed_url.netloc.lower()
