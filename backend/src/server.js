@@ -1,10 +1,14 @@
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-//routes
+// Routes
 import healthRoutes from "./routes/healthRoutes.js";
 import analyzeRoutes from "./routes/analyzeRoutes.js";
+
+// Middleware
+import { errorMiddleware } from "./middleware/errorMiddleware.js";
 
 dotenv.config();
 
@@ -18,10 +22,12 @@ app.get("/", (req, res) => {
   res.send("Scam Detector Backend is running!");
 });
 
+// API Routes
 app.use("/api/analyze", analyzeRoutes);
-
-// Health API
 app.use("/api/health", healthRoutes);
+
+// Centralized Error Handling
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

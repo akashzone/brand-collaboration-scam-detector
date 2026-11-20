@@ -6,6 +6,9 @@ export const analyzeMessage = async (message) => {
         `${process.env.ANALYZER_URL}/analyze`,
         {
             message
+        },
+        {
+            timeout: 30000
         }
     );
 
