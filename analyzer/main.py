@@ -1,6 +1,6 @@
-
 from fastapi import FastAPI
 from pydantic import BaseModel, field_validator
+from urllib.parse import urlparse
 
 from services.text_analyzer import (
     analyze_text,
@@ -9,13 +9,13 @@ from services.text_analyzer import (
 
 from services.url_analyzer import analyze_url
 from services.llm_analyzer import analyze_message_with_llm
+from services.domain_intelligence import analyze_domain_intelligence
 
 from services.risk_scorer import (
     calculate_risk_score,
     calculate_text_component_score,
     calculate_url_component_score
 )
-
 # Initialize FastAPI
 app = FastAPI(
     title="Scam Detector Analyzer",
@@ -60,6 +60,23 @@ def health_check():
     }
 
 
+def extract_unique_domains(urls: list[str]) -> list[str]:
+    domains = set()
+
+    for url in urls:
+        parsed_url = urlparse(url)
+
+        domain = parsed_url.hostname
+
+        if domain:
+            domain = domain.lower()
+
+            if domain.startswith("www."):
+                domain = domain[4:]
+
+            domains.add(domain)
+
+    return list(domains)
 
 @app.post("/analyze")
 def analyze_message(request: AnalyzeRequest):
@@ -83,8 +100,16 @@ def analyze_message(request: AnalyzeRequest):
         analyze_url(url)
         for url in extracted_urls
     ]
+    
+    # Step 5: Extract unique domains
+    unique_domains = extract_unique_domains(extracted_urls)
 
-        # LLM-based analysis
+    # Step 6: Analyze each domain using RDAP
+    domain_analysis = [
+        analyze_domain_intelligence(domain)
+        for domain in unique_domains
+    ]
+    # LLM-based analysis
     try:
         llm_result = analyze_message_with_llm(message)
 
@@ -99,7 +124,7 @@ def analyze_message(request: AnalyzeRequest):
             "message": "LLM analysis is temporarily unavailable."
         }
         
-    # Step 5: Calculate individual component scores
+    # Step 7: Calculate individual component scores
 
     text_score = calculate_text_component_score(text_analysis)
 
@@ -115,15 +140,16 @@ def analyze_message(request: AnalyzeRequest):
         url_score=url_score,
         llm_score=llm_score
     )
-        # Step 7: Return combined results
+    # Step 8: Return combined results
 
     return {
-        "success": True,
-        "data": {
-            "textAnalysis": text_analysis,
-            "textSummary": text_summary,
-            "urlAnalysis": url_analysis,
-            "llmAnalysis": llm_analysis,
-            "riskAssessment": risk_assessment
+    "success": True,
+    "data": {
+        "textAnalysis": text_analysis,
+        "textSummary": text_summary,
+        "urlAnalysis": url_analysis,
+        "domainAnalysis": domain_analysis,
+        "llmAnalysis": llm_analysis,
+        "riskAssessment": risk_assessment
         }
     }
