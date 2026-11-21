@@ -45,11 +45,12 @@ export const analyzeMessageController = async (req, res, next) => {
             });
         }
 
-        const result = await analyzeMessage(message);
+        const { data, warnings } = await analyzeMessage(message);
 
         return res.status(200).json({
             success: true,
-            data: result
+            data,
+            warnings
         });
 
     } catch (error) {
