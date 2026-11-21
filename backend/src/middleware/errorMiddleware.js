@@ -2,6 +2,20 @@
 export const errorMiddleware = (err, req, res, next) => {
     console.error("API Error:", err.message);
 
+    if (
+        err instanceof SyntaxError &&
+        err.status === 400 &&
+        "body" in err
+    ) {
+        return res.status(400).json({
+            success: false,
+            error: {
+                code: "INVALID_JSON",
+                message: "Request body contains invalid JSON."
+            }
+        });
+    }
+
     // FastAPI did not respond within the configured timeout.
     if (
         err.code === "ECONNABORTED" ||

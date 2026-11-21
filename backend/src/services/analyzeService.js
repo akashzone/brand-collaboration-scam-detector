@@ -1,9 +1,10 @@
 
 import axios from "axios";
+import { config } from "../config/env.js";
 
 export const analyzeMessage = async (message) => {
     const response = await axios.post(
-        `${process.env.ANALYZER_URL}/analyze`,
+        `${config.analyzerUrl}/analyze`,
         {
             message
         },

@@ -326,4 +326,23 @@ test("GET /api/health should return a successful health response", async () => {
 
     assert.equal(response.status, 200);
     assert.equal(response.body.success, true);
+    assert.equal(response.body.service, "scam-detector-backend");
+    assert.equal(response.body.status, "healthy");
+
+    assert.ok(response.body.timestamp);
+    assert.equal(typeof response.body.timestamp, "string");
+});
+
+
+
+test("POST /api/analyze should reject malformed JSON", async () => {
+
+    const response = await request(app)
+        .post("/api/analyze")
+        .set("Content-Type", "application/json")
+        .send('{"message": "Hello"');
+
+    assert.equal(response.status, 400);
+    assert.equal(response.body.success, false);
+    assert.equal(response.body.error.code, "INVALID_JSON");
 });
