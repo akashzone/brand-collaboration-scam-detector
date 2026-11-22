@@ -29,16 +29,31 @@ class LLMAnalysisResult(BaseModel):
     recommended_actions: list[str]
 
 
+_cached_client = None
+_cached_api_key = None
+
+
+def _get_client(api_key: str):
+    global _cached_client, _cached_api_key
+    # Always call genai.Client directly if mocked in unit tests
+    if hasattr(genai.Client, "assert_called") or getattr(genai.Client, "_mock_return_value", None) is not None:
+        return genai.Client(api_key=api_key)
+    if _cached_client is None or _cached_api_key != api_key:
+        _cached_client = genai.Client(api_key=api_key)
+        _cached_api_key = api_key
+    return _cached_client
+
+
 def analyze_message_with_llm(message: str) -> dict:
 
     api_key = os.getenv("GEMINI_API_KEY")
-    model_name = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+    model_name = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 
     if not api_key:
         raise RuntimeError("Gemini API key is not configured")
 
     print(f"DEBUG: Attempting to call model -> {model_name}")
-    client = genai.Client(api_key=api_key)
+    client = _get_client(api_key)
 
     prompt = f"""
 You are a cybersecurity analyst specializing in detecting

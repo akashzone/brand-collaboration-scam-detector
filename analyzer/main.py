@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel, field_validator
 from urllib.parse import urlparse
+from concurrent.futures import ThreadPoolExecutor
 
 from services.text_analyzer import (
     analyze_text,
@@ -104,25 +105,28 @@ def analyze_message(request: AnalyzeRequest):
     # Step 5: Extract unique domains
     unique_domains = extract_unique_domains(extracted_urls)
 
-    # Step 6: Analyze each domain using RDAP
-    domain_analysis = [
-        analyze_domain_intelligence(domain)
-        for domain in unique_domains
-    ]
-    # LLM-based analysis
-    try:
-        llm_result = analyze_message_with_llm(message)
+    # Step 6: Concurrently analyze domains via RDAP and call Gemini LLM
+    # RDAP network calls and Gemini LLM analysis are I/O bound and independent
+    with ThreadPoolExecutor(max_workers=max(len(unique_domains) + 1, 2)) as executor:
+        domain_futures = [
+            executor.submit(analyze_domain_intelligence, domain)
+            for domain in unique_domains
+        ]
+        llm_future = executor.submit(analyze_message_with_llm, message)
 
-        llm_analysis = {
-            "status": "completed",
-            "data": llm_result
-        }
+        domain_analysis = [future.result() for future in domain_futures]
 
-    except RuntimeError:
-        llm_analysis = {
-            "status": "unavailable",
-            "message": "LLM analysis is temporarily unavailable."
-        }
+        try:
+            llm_result = llm_future.result()
+            llm_analysis = {
+                "status": "completed",
+                "data": llm_result
+            }
+        except RuntimeError:
+            llm_analysis = {
+                "status": "unavailable",
+                "message": "LLM analysis is temporarily unavailable."
+            }
         
     # Step 7: Calculate individual component scores
 
