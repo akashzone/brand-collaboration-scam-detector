@@ -1,0 +1,83 @@
+/*
+ * Design tokens — see DESIGN_SYSTEM.md for the rationale behind each value.
+ * Declared in Tailwind's @theme so each token is both a CSS variable
+ * (var(--color-ink)) and a utility (text-ink, bg-paper, …).
+ */
+@theme {
+  /* Reset Tailwind's default palette so only product tokens exist. */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Core */
+  --color-ink: #17202e;
+  --color-ink-muted: #4a5567;
+  --color-ink-subtle: #667085;
+  --color-paper: #f4f6f8;
+  --color-surface: #ffffff;
+  --color-sunken: #f8f9fb;
+  --color-line: #dce1e7;
+  --color-line-strong: #8a94a3;
+  --color-action: #1f4fbf;
+  --color-action-hover: #183f99;
+  --color-action-tint: #e8eefb;
+
+  /* Header band */
+  --color-band: #17202e;
+  --color-band-fg: #e8ecf1;
+  --color-band-muted: #a9b3c1;
+
+  /* Risk: low */
+  --color-low-fg: #17663b;
+  --color-low-tint: #e6f4ec;
+  --color-low-solid: #2e9d5b;
+  /* Risk: medium (amber) */
+  --color-medium-fg: #7a4f00;
+  --color-medium-tint: #fdf2d8;
+  --color-medium-solid: #c98a00;
+  /* Risk: high (orange) */
+  --color-high-fg: #9a3f06;
+  --color-high-tint: #fde9da;
+  --color-high-solid: #dd6512;
+  /* Risk: critical (red) */
+  --color-critical-fg: #a61b12;
+  --color-critical-tint: #fce7e5;
+  --color-critical-solid: #d12a1e;
+  /* Unavailable / unknown */
+  --color-none-fg: #4a5567;
+  --color-none-tint: #edf0f3;
+  --color-none-solid: #98a1ae;
+
+  /* Evidence marks */
+  --color-mark-high: #fcd9c2;
+  --color-mark-medium: #fce7b2;
+  --color-mark-low: #d9efe1;
+
+  /* Type */
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  --text-display: 2.75rem;
+  --text-display--line-height: 3rem;
+  --text-h1: 1.75rem;
+  --text-h1--line-height: 2.125rem;
+  --text-h2: 1.25rem;
+  --text-h2--line-height: 1.75rem;
+  --text-h3: 1rem;
+  --text-h3--line-height: 1.5rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.625rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+
+  /* Radius */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+
+  /* Elevation */
+  --shadow-sheet: 0 1px 2px rgb(23 32 46 / 6%), 0 8px 24px -12px rgb(23 32 46 / 12%);
+}
