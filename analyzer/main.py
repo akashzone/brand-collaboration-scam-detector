@@ -15,7 +15,8 @@ from services.domain_intelligence import analyze_domain_intelligence
 from services.risk_scorer import (
     calculate_risk_score,
     calculate_text_component_score,
-    calculate_url_component_score
+    calculate_url_component_score,
+    calculate_domain_component_score
 )
 # Initialize FastAPI
 app = FastAPI(
@@ -122,7 +123,8 @@ def analyze_message(request: AnalyzeRequest):
                 "status": "completed",
                 "data": llm_result
             }
-        except RuntimeError:
+        except RuntimeError as err:
+            print(f"WARN: LLM analysis unavailable -> {err}")
             llm_analysis = {
                 "status": "unavailable",
                 "message": "LLM analysis is temporarily unavailable."
@@ -134,6 +136,8 @@ def analyze_message(request: AnalyzeRequest):
 
     url_score = calculate_url_component_score(url_analysis)
 
+    rdap_score = calculate_domain_component_score(domain_analysis)
+
     llm_score = None
 
     if llm_analysis["status"] == "completed":
@@ -142,7 +146,8 @@ def analyze_message(request: AnalyzeRequest):
     risk_assessment = calculate_risk_score(
         text_score=text_score,
         url_score=url_score,
-        llm_score=llm_score
+        llm_score=llm_score,
+        rdap_score=rdap_score
     )
     # Step 8: Return combined results
 
