@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { EXAMPLE_MESSAGE } from "../constants/exampleMessage.js";
+import { DEMO_MESSAGE, EXAMPLE_MESSAGE } from "../constants/exampleMessage.js";
 import { useAnalysis } from "../hooks/useAnalysis.js";
 import { Report } from "../components/report/Report.jsx";
 import { EmptyReport, ReportError, ReportLoading } from "../components/report/ReportStates.jsx";
@@ -118,7 +118,11 @@ export function AnalyzePage({ onRequestFailed }) {
               onCancel: analysis.cancel,
               onClear: handleClear,
               onUseExample: () => {
-                setMessage(EXAMPLE_MESSAGE);
+                setMessage(DEMO_MESSAGE);
+                setFieldError(null);
+              },
+              onTryDemo: () => {
+                setMessage(DEMO_MESSAGE);
                 setFieldError(null);
               },
               isLoading,

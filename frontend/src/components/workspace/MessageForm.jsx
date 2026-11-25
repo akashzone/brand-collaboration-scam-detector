@@ -1,5 +1,5 @@
-import { useId, useRef } from "react";
-import { AlertCircle, ScanText, X } from "lucide-react";
+import { useId, useRef, useState } from "react";
+import { AlertCircle, CheckCircle2, ScanText, Sparkles, X } from "lucide-react";
 import { Button } from "../ui/Button.jsx";
 import { MAX_MESSAGE_LENGTH } from "../../services/analyzeService.js";
 import { formatNumber } from "../../utils/formatters.js";
@@ -25,10 +25,12 @@ export function MessageForm({
   onCancel,
   onClear,
   onUseExample,
+  onTryDemo,
   isLoading,
   error,
   onErrorChange
 }) {
+  const [demoLoaded, setDemoLoaded] = useState(false);
   const textareaRef = useRef(null);
   const ids = useId();
   const helpId = `${ids}-help`;
@@ -39,9 +41,24 @@ export function MessageForm({
   const counterTone =
     length > MAX_MESSAGE_LENGTH ? "text-critical-fg" : length > NEAR_LIMIT ? "text-medium-fg" : "text-ink-subtle";
 
+  function handleTryDemo() {
+    if (isLoading) return;
+    const demoFn = onTryDemo || onUseExample;
+    if (demoFn) demoFn();
+    if (error) onErrorChange(null);
+    setDemoLoaded(true);
+    textareaRef.current?.focus();
+  }
+
+  function handleClear() {
+    setDemoLoaded(false);
+    onClear();
+  }
+
   function handleSubmit(event) {
     event.preventDefault();
     if (isLoading) return;
+    setDemoLoaded(false);
     const problem = validateMessage(value);
     if (problem) {
       onErrorChange(problem);
@@ -73,6 +90,7 @@ export function MessageForm({
         onChange={(event) => {
           onChange(event.target.value);
           if (error) onErrorChange(null);
+          if (demoLoaded) setDemoLoaded(false);
         }}
         onKeyDown={handleKeyDown}
         readOnly={isLoading}
@@ -103,29 +121,46 @@ export function MessageForm({
         </p>
       </div>
 
-      <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-1">
+      <div className="mt-4 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-1">
           {value ? (
-            <Button variant="quiet" icon={X} onClick={onClear} disabled={isLoading}>
+            <Button variant="quiet" icon={X} onClick={handleClear} disabled={isLoading}>
               Clear
             </Button>
-          ) : (
-            <Button variant="quiet" onClick={onUseExample} disabled={isLoading}>
-              Use an example message
-            </Button>
-          )}
+          ) : null}
         </div>
-        <div className="flex flex-col-reverse gap-2 sm:flex-row">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           {isLoading ? (
             <Button variant="secondary" onClick={onCancel}>
               Cancel
             </Button>
-          ) : null}
+          ) : (
+            <Button
+              type="button"
+              variant="secondary"
+              icon={Sparkles}
+              onClick={handleTryDemo}
+              disabled={isLoading}
+            >
+              Try Demo Message
+            </Button>
+          )}
           <Button type="submit" icon={ScanText} loading={isLoading} aria-disabled={isLoading || undefined}>
             {isLoading ? "Analyzing…" : "Analyze message"}
           </Button>
         </div>
       </div>
+
+      <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-xs text-ink-subtle">
+        <p>Not sure what to test? Try a sample message.</p>
+        {demoLoaded ? (
+          <p className="font-medium text-action flex items-center gap-1" role="status">
+            <CheckCircle2 className="size-3.5 shrink-0" aria-hidden="true" />
+            Demo message loaded. Click Analyze Message to see the results.
+          </p>
+        ) : null}
+      </div>
+
       <p className="mt-3 hidden text-xs text-ink-subtle sm:block">
         Tip: press <kbd className="font-sans font-medium text-ink-muted">Ctrl</kbd>&nbsp;+&nbsp;
         <kbd className="font-sans font-medium text-ink-muted">Enter</kbd> (

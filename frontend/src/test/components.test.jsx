@@ -7,7 +7,15 @@ import { MessageForm } from "../components/workspace/MessageForm.jsx";
 import { buildReport } from "../utils/report.js";
 
 function renderForm(props = {}) {
-  const handlers = { onChange: vi.fn(), onSubmit: vi.fn(), onErrorChange: vi.fn(), onClear: vi.fn(), onCancel: vi.fn(), onUseExample: vi.fn() };
+  const handlers = {
+    onChange: vi.fn(),
+    onSubmit: vi.fn(),
+    onErrorChange: vi.fn(),
+    onClear: vi.fn(),
+    onCancel: vi.fn(),
+    onUseExample: vi.fn(),
+    onTryDemo: vi.fn()
+  };
   render(<MessageForm value="" isLoading={false} error={null} {...handlers} {...props} />);
   return handlers;
 }
@@ -45,6 +53,24 @@ describe("MessageForm", () => {
     const field = screen.getByLabelText("Message to check");
     expect(field).toHaveAttribute("aria-invalid", "true");
     expect(field).toHaveAccessibleDescription(expect.stringContaining("Paste the message you received."));
+  });
+
+  it("renders Try Demo Message button and helper text, and triggers demo on click without submitting", async () => {
+    const handlers = renderForm({ value: "" });
+    expect(screen.getByText("Not sure what to test? Try a sample message.")).toBeInTheDocument();
+
+    const demoBtn = screen.getByRole("button", { name: "Try Demo Message" });
+    expect(demoBtn).toBeInTheDocument();
+
+    await userEvent.click(demoBtn);
+    expect(handlers.onTryDemo).toHaveBeenCalled();
+    expect(handlers.onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText("Demo message loaded. Click Analyze Message to see the results.")).toBeInTheDocument();
+  });
+
+  it("disables Try Demo Message button when loading", () => {
+    renderForm({ isLoading: true });
+    expect(screen.queryByRole("button", { name: "Try Demo Message" })).not.toBeInTheDocument();
   });
 });
 
